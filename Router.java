@@ -3,51 +3,58 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.lang.Integer;
+import java.net.*;
 
-public class Router{
+public class Router {
 
+    Socket s;
     boolean reverse;
     String ip;
     int port;
     HashMap<String, Integer> rs = new HashMap<String, Integer>();
 
-    public Router(String filename, boolean reverse){
+    public Router(String filename, boolean reverse) {
+
 
         this.reverse = reverse;
         readFile(filename);
-        updateThread u= new updateThread(10000);
+
+        try {
+            s = new Socket(ip, port);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        updateThread u = new updateThread(this, 10000);
         Thread uT = new Thread(u);
         uT.start();
-        msgThread m = new msgThread();
-        Thread mT =new Thread(m);
+        msgThread m = new msgThread(this);
+        Thread mT = new Thread(m);
         mT.start();
         readThread r = new readThread();
         Thread rT = new Thread(r);
         rT.start();
 
 
-
     }
 
-    public void readFile(String filename){
+    public void readFile(String filename) {
 
         File f = new File(filename);
         String info = "";
-        try{
-        Scanner s = new Scanner(f);
-        String[] data = s.nextLine().split(" ");
-        ip = data[0];
-        port = Integer.parseInt(data[1]);
-        int index = 0;
-        while(s.hasNextLine()){
+        try {
+            Scanner s = new Scanner(f);
+            String[] data = s.nextLine().split(" ");
+            ip = data[0];
+            port = Integer.parseInt(data[1]);
+            int index = 0;
+            while (s.hasNextLine()) {
 
-            String[] d = s.nextLine().split(" ");
-            info = d[0]+" "+d[1];
-            rs.put(info,Integer.parseInt(d[2]));
-        }
+                String[] d = s.nextLine().split(" ");
+                info = d[0] + " " + d[1];
+                rs.put(info, Integer.parseInt(d[2]));
+            }
 
-        }
-        catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
 
         }
@@ -55,9 +62,18 @@ public class Router{
 
 
     }
-    public static void main(String args[]){
+
+    public static void main(String args[]) {
         System.out.println("asdfasf");
-        Router r = new Router("./test.txt",false);
+        Router r = new Router("./test.txt", false);
+        Router r2 = new Router("./test2.txt", false);
+        String s = "127.0.0.1 9877 1" + "\n" + "127.0.0.1 9876 1" + "\n" + "127.0.0.1 9874 1";
+
+        try {
+            //r.s.send(s.getBytes(), "127.0.0.2", 9877);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 
@@ -65,7 +81,7 @@ class updateThread implements Runnable{
 
     private long gap;
 
-    public updateThread(int n){
+    public updateThread(Router r, int n){
         gap = n;
     }
 
@@ -85,30 +101,99 @@ class updateThread implements Runnable{
 
 }
 
-class msgThread  implements Runnable{
+class msgThread  implements Runnable {
 
+    Router r;
+
+    public msgThread(Router r) {
+        this.r = r;
+
+    }
 
     @Override
     public void run() {
+
+        DatagramPacket data = null;
         while (!Thread.currentThread().isInterrupted()) {
-            System.out.println("msg!!");
+
+            try {
+                data = r.s.receive();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (data != null) {
+                String info = data.getData().toString();
+                Scanner s = new Scanner(info);
+                HashMap<String, Integer> DV;
+                String firstL = s.nextLine();
+                System.out.println("get msg");
+                while(s.hasNextLine()){
+                    String i[] = s.nextLine().split(" ");
+                    DV = new HashMap<String, Integer>();
+                    String str = i[0]+" "+i[1];
+                    DV.put(str,Integer.parseInt(i[2]));
+
+                }
+                //generateDV();
+
+
+            }
+
         }
 
     }
 
 }
 
-class readThread  implements Runnable{
+class readThread implements Runnable {
 
 
-    @Override
-    public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
+        @Override
+            public void run() {
+                Scanner in = new Scanner(System.in);
+                System.out.println("Pls give commands\n");
+                while (in.hasNextLine()) {
+                    try {
+                        String command = in.nextLine();
+                        Scanner s = new Scanner(command);
+                        if (s.hasNext()) {
+                            String firstWord = s.next();
+                            switch (firstWord) {
+                                case ("PRINT"): {
 
-            System.out.println("readddd");
+                                    break;
+                                }
+                                case ("MSG"): {
+                                    String destIp = s.next();
+                                    String destPort = s.next();
+                                    String message = "";
+                                    if(s.hasNext()){
+                                        message += s.next();
+                                    }
+                                    while(s.hasNext()){
+                                        message += " " + s.next();
+                                    }
 
-        }
-    }
+                                }
+                                case ("CHANGE"): {
+                                    String destIp = s.next();
+                                    String destPort = s.next();
+                                    String weight = s.next();
+                                }
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        System.out.println("Error, please try again");
+                    }
+                }
+            }
 
 }
+
+
+
+
+
 
