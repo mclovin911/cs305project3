@@ -11,7 +11,10 @@ public class Router {
     boolean reverse;
     String ip;
     int port;
-    HashMap<String, Integer> rs = new HashMap<String, Integer>();
+    HashMap<String, Integer> DV = new HashMap<String, Integer>();
+    HashMap<String, Integer> distance = new HashMap<String, Integer>();
+
+    HashMap<String, HashMap<String, Integer>> neighborDV = new HashMap<String, HashMap<String, Integer>>();
 
     public Router(String filename, boolean reverse) {
 
@@ -51,7 +54,7 @@ public class Router {
 
                 String[] d = s.nextLine().split(" ");
                 info = d[0] + " " + d[1];
-                rs.put(info, Integer.parseInt(d[2]));
+                distance.put(info, Integer.parseInt(d[2]));
             }
 
         } catch (FileNotFoundException e) {
