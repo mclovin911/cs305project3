@@ -4,9 +4,12 @@ import java.io.FileNotFoundException;
 import java.lang.Integer;
 import java.net.*;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 public class Router {
 
     Socket s;
+    ReentrantLock lock;
     private boolean reverse;
     private Address addr;
     private String ip;
@@ -20,6 +23,7 @@ public class Router {
 
         this.reverse = reverse;
         t= new Table();
+        lock = new ReentrantLock();
         readFile(filename);
 
         try {
@@ -36,10 +40,15 @@ public class Router {
         receiveThread m = new receiveThread(this);
         Thread mT = new Thread(m);
         mT.start();
-        readThread r = new readThread();
+        readThread r = new readThread(this);
         Thread rT = new Thread(r);
         rT.start();
 
+    }
+
+
+    public ReentrantLock getLock() {
+        return lock;
     }
 
     public boolean isReverse() {
@@ -157,16 +166,11 @@ public class Router {
     }
 
     public static void main(String args[]) {
-        System.out.println("asdfasf");
+
         Router r = new Router("./test.txt", false);
         Router r2 = new Router("./test2.txt", false);
-        String s = "127.0.0.1 9877 1" + "\n" + "127.0.0.1 9876 1" + "\n" + "127.0.0.1 9874 1";
-
-        try {
-            r.s.send_dv(s.getBytes(), "127.0.0.2", 9877);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Router r3 = new Router("./test3.txt", false);
+        Router r4 = new Router("./test4.txt", false);
     }
 }
 
@@ -200,8 +204,11 @@ class updateThread implements Runnable{
         ArrayList<Address> neighbor = r.getNeighbors();
         for(int i =0; i<neighbor.size();i++){
             try{
+
                 r.s.send_dv(s.getBytes(),neighbor.get(i).getIp(),neighbor.get(i).getPort());
                 System.out.println("Send DV to"+ neighbor.get(i).getPort());
+
+
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -236,7 +243,9 @@ class updateThread implements Runnable{
                 Map.Entry key_value = (Map.Entry)iterator.next();
                 Address address     = (Address)key_value.getKey(); //to which router
                 Integer dist        = (Integer)key_value.getValue(); //the distance
+
                 System.out.println(r.DV.containsKey(from));
+
                 int newer           = r.DV.get(from) + dist; //the distance go though this  map router
                 if(r.DV.containsKey(address)){//if this router is the neighbor
                     int old = r.DV.get(address);   //the old distance
@@ -289,10 +298,12 @@ class receiveThread  implements Runnable {
                 System.out.println("new dv received from "+ data.getAddress().toString()+ ":"+
                     data.getPort() +"with the following distances:");
                 
+
                 while(s.hasNextLine()){
                     String g = s.nextLine();
                     String i[] = g.split(" ");
                     if(i.length==3){
+
                         String str = i[0]+" "+i[1];
                         DV.put(new Address(i[0],Integer.parseInt(i[1])),Integer.parseInt(i[2].trim()));
                         
@@ -302,6 +313,7 @@ class receiveThread  implements Runnable {
                 }
 
                 System.out.println("adfasdsdf"+ data.getAddress().toString().split("/")[1]);
+
                 r.putDV(new Address(data.getAddress().toString().split("/")[1],data.getPort()), DV); //put the DV sent by the neighbor to the neiborDV.
 
             }
@@ -313,6 +325,35 @@ class receiveThread  implements Runnable {
 }
 
 class readThread implements Runnable {
+    private Router r;
+
+    /**
+     * Constructor of readThread
+     */
+    public readThread(Router r) {
+        this.r = r;
+    }
+    public synchronized void print(){
+        System.out.println("Current DV for router " + r.getAddr().toString() + ": " + "\n" + r.getDVString());
+
+        Iterator it = r.neighborDV.entrySet().iterator();
+
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            Address from = (Address) pair.getKey(); //from which router
+            HashMap<Address, Integer> dv = (HashMap<Address, Integer>) pair.getValue();//the dv from that router
+
+            Iterator iterator = dv.entrySet().iterator();
+
+            System.out.println("DV received from " + from.toString());
+            while (iterator.hasNext()) {
+                Map.Entry key_value = (Map.Entry) iterator.next();
+                Address address = (Address) key_value.getKey(); //to which router
+                Integer dist = (Integer) key_value.getValue(); //the distance
+                System.out.println(address.toString()+" "+dist);
+            }
+        }
+    }
 
     @Override
     public void run() {
@@ -326,9 +367,18 @@ class readThread implements Runnable {
                     String firstWord = s.next();
                     switch (firstWord) {
                         case ("PRINT"): {
-
+                            ReentrantLock lock = r.getLock();
+                            lock.lock();
+                            try {
+                                print();
+                            } finally {
+                                lock.unlock();
+                            }
+                            s.close();
                             break;
                         }
+
+
                         case ("MSG"): {
                             String destIp = s.next();
                             String destPort = s.next();
@@ -339,12 +389,14 @@ class readThread implements Runnable {
                             while(s.hasNext()){
                                 message += " " + s.next();
                             }
+                            break;
 
                         }
                         case ("CHANGE"): {
                             String destIp = s.next();
                             String destPort = s.next();
                             String weight = s.next();
+                            break;
                         }
                     }
                 }
