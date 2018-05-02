@@ -182,14 +182,15 @@ class updateThread implements Runnable{
                Map.Entry key_value = (Map.Entry)it.next();
                Address address     = (Address)pair.getKey(); //to which router
                Integer dist        = (Integer)pair.getValue(); //the distance
-               
+               int newer           = r.DV.get(from) + dist; //the distance go though this  map router
                if(r.DV.containsKey(address)){//if this router is the neighbor 
-                   int old = r.DV.get(address);   //the old distance
-                   int newer = r.DV.get(from) + dist; //the distance go though this  map router
+                   int old = r.DV.get(address);   //the old distance    
                    if( old > newer){
                        r.DV.replace(address, newer);
                     }                 
-                }  
+                }else{
+                    r.DV.put(address, newer);
+                }
                 iterator.remove();
             }
             it.remove(); // avoids a ConcurrentModificationException
