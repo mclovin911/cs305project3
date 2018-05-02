@@ -5,5 +5,5 @@ comment1.target=Socket(java.lang.String,\ int)
 comment2.params=
 comment2.target=java.net.DatagramPacket\ receive()
 comment3.params=send_data\ ip_address\ port
-comment3.target=void\ send(byte[],\ java.lang.String,\ int)
+comment3.target=void\ send(java.lang.String,\ java.lang.String,\ int)
 numComments=4

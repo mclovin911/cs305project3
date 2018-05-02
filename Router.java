@@ -211,7 +211,7 @@ class updateThread implements Runnable{
             it.remove(); // avoids a ConcurrentModificationException
         }
 
-
+        
 
 
         //dist(s) = min of all neighbor i{dist(i->s)+dist(i)}

@@ -5,9 +5,12 @@ public class Socket{
     DatagramSocket serverSocket;
   
     InetAddress my_ip;
-    
+    String ip;
+    int port;
     
     public Socket(String ip, int port_num)throws Exception{
+        this.ip = ip;
+        port = port_num;
         my_ip = InetAddress.getByName(ip);
         serverSocket = new DatagramSocket(port_num, my_ip);
     }
@@ -25,9 +28,10 @@ public class Socket{
         return receive_packet;
     }
 
-    public void send(byte[] send_data, String ip_address, int port)throws Exception{   
-        
-        DatagramPacket send_packet = new DatagramPacket(send_data, send_data.length, InetAddress.getByName(ip_address), port);
+    public void send(String send_data, String ip_address, int port)throws Exception{   
+        String suffixed_data = send_data + " " + ip + "-" + port;
+        byte[] msg = suffixed_data.getBytes();
+        DatagramPacket send_packet = new DatagramPacket(msg, msg.length, InetAddress.getByName(ip_address), port);
         serverSocket.send(send_packet);  
     }
 }
