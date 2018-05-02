@@ -27,8 +27,14 @@ public class Socket{
         //int port = receive_packet.getPort();
         return receive_packet;
     }
+    
+    public void send_dv(byte[] msg, String ip_address, int port)throws Exception{
+        
+        DatagramPacket send_packet = new DatagramPacket(msg, msg.length, InetAddress.getByName(ip_address), port);
+        serverSocket.send(send_packet); 
+    }
 
-    public void send(String send_data, String ip_address, int port)throws Exception{   
+    public void send_msg(String send_data, String ip_address, int port)throws Exception{   
         String suffixed_data = send_data + " " + ip + "-" + port;
         byte[] msg = suffixed_data.getBytes();
         DatagramPacket send_packet = new DatagramPacket(msg, msg.length, InetAddress.getByName(ip_address), port);
