@@ -6,15 +6,15 @@ import java.util.HashMap;
 
 public class Table {
 
-    private HashMap<String, String> table; // the first string is the desired dest, second is the router to send to
-    
+    private HashMap<Address, Address> table; // the first string is the desired dest, second is the router to send to
+
     public Table() {
-        table = new HashMap<String, String>();
+        table = new HashMap<Address, Address>();
     }
-    public void put(String dest, String next) {
+    public void put(Address dest, Address next) {
         table.put(dest, next);
     }
-    public void replace(String key, String value){
+    public void replace(Address key, Address value){
         table.replace(key, value);
-       }
+    }
 }

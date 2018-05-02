@@ -122,11 +122,11 @@ public class Router {
         neighborDV.put(senderInfo, tmp);
     }
 
-    public void putInTable(String dest, String next) {
+    public void putInTable(Address dest, Address next) {
         t.put(dest, next);
     }
-    
-    public void replaceInTable(String dest, String next){
+
+    public void replaceInTable(Address dest, Address next){
         t.replace(dest, next);
     }
 
@@ -177,43 +177,43 @@ class updateThread implements Runnable{
         if(r.DV.containsKey(r.getAddr())){
             if(r.DV.get(r.getAddr())!=0){
                 r.DV.replace(r.getAddr(), 0);
-            }        
+            }
         }else{
             r.DV.put(r.getAddr(),0);
         }
-        
+
         Iterator it = r.neighborDV.entrySet().iterator();
-        
+
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             Address from = (Address)pair.getKey(); //from which router
             HashMap<Address, Integer> dv = (HashMap<Address, Integer>)pair.getValue();//the dv from that router
-            
+
             Iterator iterator = dv.entrySet().iterator();
-            
+
             while(it.hasNext()){
-               Map.Entry key_value = (Map.Entry)it.next();
-               Address address     = (Address)pair.getKey(); //to which router
-               Integer dist        = (Integer)pair.getValue(); //the distance
-               int newer           = r.DV.get(from) + dist; //the distance go though this  map router
-               if(r.DV.containsKey(address)){//if this router is the neighbor 
-                   int old = r.DV.get(address);   //the old distance    
-                   if( old > newer){
-                       r.DV.replace(address, newer);
-                       r.replaceInTable(address.getIp(), from.getIp());
-                    }                 
+                Map.Entry key_value = (Map.Entry)it.next();
+                Address address     = (Address)pair.getKey(); //to which router
+                Integer dist        = (Integer)pair.getValue(); //the distance
+                int newer           = r.DV.get(from) + dist; //the distance go though this  map router
+                if(r.DV.containsKey(address)){//if this router is the neighbor
+                    int old = r.DV.get(address);   //the old distance
+                    if( old > newer){
+                        r.DV.replace(address, newer);
+                        r.replaceInTable(address, from);
+                    }
                 }else{
                     r.DV.put(address, newer);
-                    r.putInTable(address.getIp(), from.getIp());
+                    r.putInTable(address, from);
                 }
                 iterator.remove();
             }
             it.remove(); // avoids a ConcurrentModificationException
         }
 
-        
-        
-        
+
+
+
         //dist(s) = min of all neighbor i{dist(i->s)+dist(i)}
 
         //this dist to itself is always 0
