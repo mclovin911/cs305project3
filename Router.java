@@ -46,7 +46,6 @@ public class Router {
 
     }
 
-
     public ReentrantLock getLock() {
         return lock;
     }
@@ -98,7 +97,6 @@ public class Router {
     public void setNeighborDV(HashMap<Address, HashMap<Address, Integer>> neighborDV) {
         this.neighborDV = neighborDV;
     }
-
     public String getDVString(){
         String s = "";
         Iterator it = DV.entrySet().iterator();
@@ -119,7 +117,7 @@ public class Router {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             Address addr = (Address)pair.getKey();
-            a.add(addr);
+           a.add(addr);
 
         }
         return a;
@@ -152,7 +150,6 @@ public class Router {
         System.out.println("file read ");
 
     }
-
     public void putDV(Address senderInfo, HashMap<Address, Integer> tmp) {
         neighborDV.put(senderInfo, tmp);
     }
@@ -171,6 +168,8 @@ public class Router {
         Router r2 = new Router("./test2.txt", false);
         Router r3 = new Router("./test3.txt", false);
         Router r4 = new Router("./test4.txt", false);
+
+
     }
 }
 
@@ -199,16 +198,12 @@ class updateThread implements Runnable{
             }
         }
     }
-
     private void broadCastDV(String s){
         ArrayList<Address> neighbor = r.getNeighbors();
         for(int i =0; i<neighbor.size();i++){
             try{
-
-                r.s.send_dv(s.getBytes(),neighbor.get(i).getIp(),neighbor.get(i).getPort());
-                System.out.println("Send DV to"+ neighbor.get(i).getPort());
-
-
+            r.s.send_dv(s.getBytes(),neighbor.get(i).getIp(),neighbor.get(i).getPort());
+            //System.out.println("Send DV to"+ neighbor.get(i).getPort());
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -243,9 +238,8 @@ class updateThread implements Runnable{
                 Map.Entry key_value = (Map.Entry)iterator.next();
                 Address address     = (Address)key_value.getKey(); //to which router
                 Integer dist        = (Integer)key_value.getValue(); //the distance
-
-                System.out.println(r.DV.containsKey(from));
-
+                //System.out.println(r.getDVString());
+                //System.out.println("from ididid "+from.getIp()+"  "+from.getPort());
                 int newer           = r.DV.get(from) + dist; //the distance go though this  map router
                 if(r.DV.containsKey(address)){//if this router is the neighbor
                     int old = r.DV.get(address);   //the old distance
@@ -262,15 +256,24 @@ class updateThread implements Runnable{
             it.remove(); // avoids a ConcurrentModificationException
         }
 
+
+
+
         //dist(s) = min of all neighbor i{dist(i->s)+dist(i)}
+
         //this dist to itself is always 0
         //r.pubInTable(r.getAddr().getIp(),r.getAddr().getIp());
         //r.getDV().put();
 
+
     }
+
 }
+
 class receiveThread  implements Runnable {
+
     Router r;
+
     public receiveThread(Router r) {
         this.r = r;
 
@@ -294,26 +297,15 @@ class receiveThread  implements Runnable {
                 Scanner s = new Scanner(info);
                 HashMap<Address, Integer> DV;
                 DV = new HashMap<Address, Integer>();
-              
-                System.out.println("new dv received from "+ data.getAddress().toString()+ ":"+
-                    data.getPort() +"with the following distances:");
-                
-
+                //System.out.println("get msg");
                 while(s.hasNextLine()){
                     String g = s.nextLine();
                     String i[] = g.split(" ");
                     if(i.length==3){
-
-                        String str = i[0]+" "+i[1];
-                        DV.put(new Address(i[0],Integer.parseInt(i[1])),Integer.parseInt(i[2].trim()));
-                        
-                        System.out.println(i[0] + ":" + i[1] + " " + i[2]);
-                    
-                    }
+                    String str = i[0]+" "+i[1];
+                    DV.put(new Address(i[0],Integer.parseInt(i[1])),Integer.parseInt(i[2].trim()));}
                 }
-
-                System.out.println("adfasdsdf"+ data.getAddress().toString().split("/")[1]);
-
+                //System.out.println(data.getAddress().toString().split("/")[1]);
                 r.putDV(new Address(data.getAddress().toString().split("/")[1],data.getPort()), DV); //put the DV sent by the neighbor to the neiborDV.
 
             }
