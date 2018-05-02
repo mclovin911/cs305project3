@@ -1,11 +1,8 @@
 import java.io.File;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 import java.io.FileNotFoundException;
 import java.lang.Integer;
 import java.net.*;
-import java.util.Iterator;
-import java.util.Map;
 
 public class Router {
 
@@ -91,6 +88,31 @@ public class Router {
     public void setNeighborDV(HashMap<Address, HashMap<Address, Integer>> neighborDV) {
         this.neighborDV = neighborDV;
     }
+    public String getDVString(){
+        String s = "";
+        Iterator it = DV.entrySet().iterator();
+
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            Address addr = (Address)pair.getKey();
+            s = s+addr.getIp()+" "+addr.getPort()+" "+pair.getValue()+"\n";
+
+        }
+        return s;
+    }
+
+    public ArrayList<Address> getNeighbors(){
+        ArrayList<Address> a = new ArrayList<Address>();
+        Iterator it = distance.entrySet().iterator();
+
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            Address addr = (Address)pair.getKey();
+           a.add(addr);
+
+        }
+        return a;
+    }
 
     public void readFile(String filename) {
 
@@ -110,6 +132,7 @@ public class Router {
                 distance.put(new Address(d[0],Integer.parseInt(d[1])), Integer.parseInt(d[2]));
                 DV = distance; //initialize the distance vector. (the weight to known neighbor)
             }
+            System.out.println("test get String+"+ "\n"+getDVString() );
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -136,6 +159,7 @@ public class Router {
         Router r2 = new Router("./test2.txt", false);
         String s = "127.0.0.1 9877 1" + "\n" + "127.0.0.1 9876 1" + "\n" + "127.0.0.1 9874 1";
 
+
         try {
             r.s.send_dv(s.getBytes(), "127.0.0.2", 9877);
         } catch (Exception e) {
@@ -160,9 +184,23 @@ class updateThread implements Runnable{
 
             //System.out.println("update !!!");
             recalcDV();
+            broadCastDV(r.getDVString());
+
             try {
                 Thread.sleep(gap);
             } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    private void broadCastDV(String s){
+        ArrayList<Address> neighbor = r.getNeighbors();
+        for(int i =0; i<neighbor.size();i++){
+            try{
+            r.s.send_dv(s.getBytes(),neighbor.get(i).getIp(),neighbor.get(i).getPort());
+            System.out.println("Send DV to"+ neighbor.get(i).getPort());
+            }
+            catch (Exception e){
                 e.printStackTrace();
             }
         }
@@ -211,7 +249,7 @@ class updateThread implements Runnable{
             it.remove(); // avoids a ConcurrentModificationException
         }
 
-        
+
 
 
         //dist(s) = min of all neighbor i{dist(i->s)+dist(i)}
@@ -254,9 +292,11 @@ class receiveThread  implements Runnable {
                 DV = new HashMap<Address, Integer>();
                 System.out.println("get msg");
                 while(s.hasNextLine()){
-                    String i[] = s.nextLine().split(" ");
+                    String g = s.nextLine();
+                    String i[] = g.split(" ");
+                    if(i.length==2){
                     String str = i[0]+" "+i[1];
-                    DV.put(new Address(i[0],Integer.parseInt(i[1])),Integer.parseInt(i[2].trim()));
+                    DV.put(new Address(i[0],Integer.parseInt(i[1])),Integer.parseInt(i[2].trim()));}
                 }
                 System.out.println(data.getAddress().toString().split("/")[1]);
                 r.putDV(new Address(data.getAddress().toString().split("/")[1],data.getPort()), DV); //put the DV sent by the neighbor to the neiborDV.
