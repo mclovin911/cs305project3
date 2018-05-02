@@ -154,17 +154,13 @@ public class Router {
     }
 
     public static void main(String args[]) {
-        System.out.println("asdfasf");
+
         Router r = new Router("./test.txt", false);
         Router r2 = new Router("./test2.txt", false);
-        String s = "127.0.0.1 9877 1" + "\n" + "127.0.0.1 9876 1" + "\n" + "127.0.0.1 9874 1";
+        Router r3 = new Router("./test3.txt", false);
+        Router r4 = new Router("./test4.txt", false);
 
 
-        try {
-            r.s.send_dv(s.getBytes(), "127.0.0.2", 9877);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
 
@@ -198,7 +194,7 @@ class updateThread implements Runnable{
         for(int i =0; i<neighbor.size();i++){
             try{
             r.s.send_dv(s.getBytes(),neighbor.get(i).getIp(),neighbor.get(i).getPort());
-            System.out.println("Send DV to"+ neighbor.get(i).getPort());
+            //System.out.println("Send DV to"+ neighbor.get(i).getPort());
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -229,10 +225,12 @@ class updateThread implements Runnable{
 
             Iterator iterator = dv.entrySet().iterator();
 
-            while(it.hasNext()){
-                Map.Entry key_value = (Map.Entry)it.next();
-                Address address     = (Address)pair.getKey(); //to which router
-                Integer dist        = (Integer)pair.getValue(); //the distance
+            while(iterator.hasNext()){
+                Map.Entry key_value = (Map.Entry)iterator.next();
+                Address address     = (Address)key_value.getKey(); //to which router
+                Integer dist        = (Integer)key_value.getValue(); //the distance
+                System.out.println(r.getDVString());
+                System.out.println("from ididid "+from.getIp()+"  "+from.getPort());
                 int newer           = r.DV.get(from) + dist; //the distance go though this  map router
                 if(r.DV.containsKey(address)){//if this router is the neighbor
                     int old = r.DV.get(address);   //the old distance
@@ -290,15 +288,15 @@ class receiveThread  implements Runnable {
                 Scanner s = new Scanner(info);
                 HashMap<Address, Integer> DV;
                 DV = new HashMap<Address, Integer>();
-                System.out.println("get msg");
+                //System.out.println("get msg");
                 while(s.hasNextLine()){
                     String g = s.nextLine();
                     String i[] = g.split(" ");
-                    if(i.length==2){
+                    if(i.length==3){
                     String str = i[0]+" "+i[1];
                     DV.put(new Address(i[0],Integer.parseInt(i[1])),Integer.parseInt(i[2].trim()));}
                 }
-                System.out.println(data.getAddress().toString().split("/")[1]);
+                //System.out.println(data.getAddress().toString().split("/")[1]);
                 r.putDV(new Address(data.getAddress().toString().split("/")[1],data.getPort()), DV); //put the DV sent by the neighbor to the neiborDV.
 
             }
@@ -323,6 +321,9 @@ class readThread implements Runnable {
                     String firstWord = s.next();
                     switch (firstWord) {
                         case ("PRINT"): {
+                            System.out.println("Current DV: "+"\n");
+                            //System.
+
 
                             break;
                         }
