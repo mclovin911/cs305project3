@@ -190,6 +190,7 @@ class updateThread implements Runnable{
                        r.DV.replace(address, newer);
                     }                 
                 }  
+                iterator.remove();
             }
             it.remove(); // avoids a ConcurrentModificationException
         }
