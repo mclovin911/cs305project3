@@ -1,0 +1,288 @@
+Class documentation
+<---- javadoc command: ---->
+/usr/lib/jvm/java-8-openjdk-amd64/bin/javadoc
+-author
+-version
+-nodeprecated
+-package
+-Xdoclint:none
+-noindex
+-notree
+-nohelp
+-nonavbar
+-source
+1.8
+-classpath
+/usr/share/bluej/bluejcore.jar:/usr/share/bluej/junit-4.11.jar:/usr/share/bluej/hamcrest-core-1.3.jar:/usr/share/bluej/lang-stride.jar:/usr/share/bluej/userlib/pi4j-core.jar:/usr/share/bluej/userlib/pi4j-gpio-extension.jar:/usr/share/bluej/userlib/pi4j-device.jar:/usr/share/bluej/userlib/pi4j-service.jar:/home/mclovin/Documents/305/Project3
+-d
+/home/mclovin/Documents/305/Project3/doc
+-encoding
+UTF-8
+-charset
+UTF-8
+/home/mclovin/Documents/305/Project3/Router.java
+<---- end of javadoc command ---->
+Loading source file /home/mclovin/Documents/305/Project3/Router.java...
+/home/mclovin/Documents/305/Project3/Router.java:51: error: illegal start of expression
+<<<<<<< HEAD
+^
+/home/mclovin/Documents/305/Project3/Router.java:51: error: illegal start of expression
+<<<<<<< HEAD
+  ^
+/home/mclovin/Documents/305/Project3/Router.java:51: error: illegal start of expression
+<<<<<<< HEAD
+    ^
+/home/mclovin/Documents/305/Project3/Router.java:52: error: > expected
+		return reverse;
+		^
+/home/mclovin/Documents/305/Project3/Router.java:52: error: ';' expected
+		return reverse;
+		      ^
+/home/mclovin/Documents/305/Project3/Router.java:100: error: illegal start of expression
+=======
+^
+/home/mclovin/Documents/305/Project3/Router.java:100: error: illegal start of expression
+=======
+  ^
+/home/mclovin/Documents/305/Project3/Router.java:100: error: illegal start of expression
+=======
+    ^
+/home/mclovin/Documents/305/Project3/Router.java:100: error: illegal start of expression
+=======
+      ^
+/home/mclovin/Documents/305/Project3/Router.java:101: error: illegal start of expression
+        return reverse;
+        ^
+/home/mclovin/Documents/305/Project3/Router.java:101: error: not a statement
+        return reverse;
+               ^
+/home/mclovin/Documents/305/Project3/Router.java:149: error: illegal start of expression
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+^
+/home/mclovin/Documents/305/Project3/Router.java:149: error: illegal start of expression
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+   ^
+/home/mclovin/Documents/305/Project3/Router.java:149: error: illegal start of expression
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+      ^
+/home/mclovin/Documents/305/Project3/Router.java:149: error: ';' expected
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+             ^
+/home/mclovin/Documents/305/Project3/Router.java:151: error: ';' expected
+        File f = new File(filename);
+            ^
+/home/mclovin/Documents/305/Project3/Router.java:164: error: illegal start of expression
+<<<<<<< HEAD
+^
+/home/mclovin/Documents/305/Project3/Router.java:164: error: illegal start of expression
+<<<<<<< HEAD
+  ^
+/home/mclovin/Documents/305/Project3/Router.java:164: error: illegal start of expression
+<<<<<<< HEAD
+    ^
+/home/mclovin/Documents/305/Project3/Router.java:165: error: > expected
+                distance.put(info, Integer.parseInt(d[2]));
+                ^
+/home/mclovin/Documents/305/Project3/Router.java:165: error: ';' expected
+                distance.put(info, Integer.parseInt(d[2]));
+                        ^
+/home/mclovin/Documents/305/Project3/Router.java:166: error: illegal start of expression
+=======
+^
+/home/mclovin/Documents/305/Project3/Router.java:166: error: illegal start of expression
+=======
+  ^
+/home/mclovin/Documents/305/Project3/Router.java:166: error: illegal start of expression
+=======
+    ^
+/home/mclovin/Documents/305/Project3/Router.java:166: error: illegal start of expression
+=======
+      ^
+/home/mclovin/Documents/305/Project3/Router.java:168: error: illegal start of expression
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+^
+/home/mclovin/Documents/305/Project3/Router.java:168: error: illegal start of expression
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+   ^
+/home/mclovin/Documents/305/Project3/Router.java:168: error: illegal start of expression
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+      ^
+/home/mclovin/Documents/305/Project3/Router.java:168: error: ';' expected
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+             ^
+/home/mclovin/Documents/305/Project3/Router.java:244: error: illegal start of expression
+<<<<<<< HEAD
+^
+/home/mclovin/Documents/305/Project3/Router.java:244: error: illegal start of expression
+<<<<<<< HEAD
+  ^
+/home/mclovin/Documents/305/Project3/Router.java:244: error: illegal start of expression
+<<<<<<< HEAD
+    ^
+/home/mclovin/Documents/305/Project3/Router.java:245: error: > expected
+           System.out.println("update !!!");
+           ^
+/home/mclovin/Documents/305/Project3/Router.java:245: error: ';' expected
+           System.out.println("update !!!");
+                 ^
+/home/mclovin/Documents/305/Project3/Router.java:254: error: class, interface, or enum expected
+   private void recalcDV() {
+           ^
+/home/mclovin/Documents/305/Project3/Router.java:266: error: class, interface, or enum expected
+   }
+   ^
+/home/mclovin/Documents/305/Project3/Router.java:302: error: illegal start of expression
+<<<<<<< HEAD
+^
+/home/mclovin/Documents/305/Project3/Router.java:302: error: illegal start of expression
+<<<<<<< HEAD
+  ^
+/home/mclovin/Documents/305/Project3/Router.java:302: error: illegal start of expression
+<<<<<<< HEAD
+    ^
+/home/mclovin/Documents/305/Project3/Router.java:303: error: > expected
+                HashMap<String, Integer> DV;
+                ^
+/home/mclovin/Documents/305/Project3/Router.java:303: error: not a statement
+                HashMap<String, Integer> DV;
+                       ^
+/home/mclovin/Documents/305/Project3/Router.java:303: error: ';' expected
+                HashMap<String, Integer> DV;
+                              ^
+/home/mclovin/Documents/305/Project3/Router.java:303: error: not a statement
+                HashMap<String, Integer> DV;
+                                       ^
+/home/mclovin/Documents/305/Project3/Router.java:306: error: illegal start of expression
+=======
+^
+/home/mclovin/Documents/305/Project3/Router.java:306: error: illegal start of expression
+=======
+  ^
+/home/mclovin/Documents/305/Project3/Router.java:306: error: illegal start of expression
+=======
+    ^
+/home/mclovin/Documents/305/Project3/Router.java:306: error: illegal start of expression
+=======
+      ^
+/home/mclovin/Documents/305/Project3/Router.java:307: error: ';' expected
+                HashMap<Address, Integer> DV;
+                               ^
+/home/mclovin/Documents/305/Project3/Router.java:307: error: not a statement
+                HashMap<Address, Integer> DV;
+                                        ^
+/home/mclovin/Documents/305/Project3/Router.java:309: error: illegal start of expression
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+^
+/home/mclovin/Documents/305/Project3/Router.java:309: error: illegal start of expression
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+   ^
+/home/mclovin/Documents/305/Project3/Router.java:309: error: illegal start of expression
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+      ^
+/home/mclovin/Documents/305/Project3/Router.java:309: error: ';' expected
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+             ^
+/home/mclovin/Documents/305/Project3/Router.java:310: error: ';' expected
+                System.out.println("get msg");
+                      ^
+/home/mclovin/Documents/305/Project3/Router.java:314: error: illegal start of expression
+<<<<<<< HEAD
+^
+/home/mclovin/Documents/305/Project3/Router.java:314: error: illegal start of expression
+<<<<<<< HEAD
+  ^
+/home/mclovin/Documents/305/Project3/Router.java:314: error: illegal start of expression
+<<<<<<< HEAD
+    ^
+/home/mclovin/Documents/305/Project3/Router.java:315: error: > expected
+                    DV.put(str,Integer.parseInt(i[2]));
+                    ^
+/home/mclovin/Documents/305/Project3/Router.java:315: error: ';' expected
+                    DV.put(str,Integer.parseInt(i[2]));
+                      ^
+/home/mclovin/Documents/305/Project3/Router.java:318: error: illegal start of expression
+=======
+^
+/home/mclovin/Documents/305/Project3/Router.java:318: error: illegal start of expression
+=======
+  ^
+/home/mclovin/Documents/305/Project3/Router.java:318: error: illegal start of expression
+=======
+    ^
+/home/mclovin/Documents/305/Project3/Router.java:318: error: illegal start of expression
+=======
+      ^
+/home/mclovin/Documents/305/Project3/Router.java:323: error: illegal start of expression
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+^
+/home/mclovin/Documents/305/Project3/Router.java:323: error: illegal start of expression
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+   ^
+/home/mclovin/Documents/305/Project3/Router.java:323: error: illegal start of expression
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+      ^
+/home/mclovin/Documents/305/Project3/Router.java:323: error: ';' expected
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+             ^
+/home/mclovin/Documents/305/Project3/Router.java:323: error: not a statement
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+                ^
+/home/mclovin/Documents/305/Project3/Router.java:323: error: ';' expected
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+                                                ^
+/home/mclovin/Documents/305/Project3/Router.java:331: error: class, interface, or enum expected
+}
+^
+/home/mclovin/Documents/305/Project3/Router.java:370: error: illegal start of expression
+<<<<<<< HEAD
+^
+/home/mclovin/Documents/305/Project3/Router.java:370: error: illegal start of expression
+<<<<<<< HEAD
+  ^
+/home/mclovin/Documents/305/Project3/Router.java:370: error: illegal start of expression
+<<<<<<< HEAD
+    ^
+/home/mclovin/Documents/305/Project3/Router.java:371: error: > expected
+            }
+            ^
+/home/mclovin/Documents/305/Project3/Router.java:371: error: ';' expected
+            }
+             ^
+/home/mclovin/Documents/305/Project3/Router.java:375: error: illegal start of expression
+=======
+^
+/home/mclovin/Documents/305/Project3/Router.java:375: error: illegal start of expression
+=======
+    ^
+/home/mclovin/Documents/305/Project3/Router.java:375: error: illegal start of expression
+=======
+      ^
+/home/mclovin/Documents/305/Project3/Router.java:377: error: illegal start of expression
+            } catch (Exception e) {
+            ^
+/home/mclovin/Documents/305/Project3/Router.java:377: error: 'catch' without 'try'
+            } catch (Exception e) {
+              ^
+/home/mclovin/Documents/305/Project3/Router.java:341: error: 'try' without 'catch', 'finally' or resource declarations
+            try {
+            ^
+/home/mclovin/Documents/305/Project3/Router.java:384: error: illegal start of type
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+^
+/home/mclovin/Documents/305/Project3/Router.java:384: error: ';' expected
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+   ^
+/home/mclovin/Documents/305/Project3/Router.java:384: error: illegal start of type
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+      ^
+/home/mclovin/Documents/305/Project3/Router.java:384: error: <identifier> expected
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+       ^
+/home/mclovin/Documents/305/Project3/Router.java:384: error: ';' expected
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+             ^
+/home/mclovin/Documents/305/Project3/Router.java:384: error: reached end of file while parsing
+>>>>>>> 7794f680a48ccd7de6cce14ada1fa62b1c24562f
+                                                ^
+/home/mclovin/Documents/305/Project3/Router.java:385: error: reached end of file while parsing
+88 errors
