@@ -1,9 +1,12 @@
 #BlueJ class context
 comment0.target=Router
+comment0.text=\n\ This\ is\ a\ router\ class\ that\ simulates\ the\ behavior\ of\ a\ router\n
 comment1.params=filename\ reverse
 comment1.target=Router(java.lang.String,\ boolean)
+comment1.text=\n\ the\ constructor\ of\ an\ router\n\ String\ filename\:\ the\ filename\ of\ the\ initial\ distance\ vector\n\ boolean\ reverse\:\ whether\ to\ implement\ poison\ reverse\n
 comment2.params=filename
 comment2.target=void\ readFile(java.lang.String)
+comment2.text=\n\ This\ method\ read\ the\ file\ and\ saves\ the\ information\ in\ the\ file\ to\ the\ memory\n
 comment3.params=args
 comment3.target=void\ main(java.lang.String[])
 numComments=4

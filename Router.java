@@ -5,18 +5,29 @@ import java.io.FileNotFoundException;
 import java.lang.Integer;
 import java.net.*;
 
+/**
+ * This is a router class that simulates the behavior of a router
+ */
 public class Router {
-
+    //This router has a network layer interface, s
     Socket s;
+    //an indicator of poison reverse
     boolean reverse;
+    //the ip address of this network layer interface
     String ip;
+    //the port number
     int port;
+    //this is the routing table for this router
     HashMap<String, Integer> rs = new HashMap<String, Integer>();
 
+    /**
+     * the constructor of an router
+     * String filename: the filename of the initial distance vector
+     * boolean reverse: whether to implement poison reverse
+     */
     public Router(String filename, boolean reverse) {
-
-
         this.reverse = reverse;
+        //initialize this router with the given information
         readFile(filename);
 
         try {
@@ -37,6 +48,9 @@ public class Router {
 
     }
 
+    /**
+     * This method read the file and saves the information in the file to the memory
+     */
     public void readFile(String filename) {
 
         File f = new File(filename);
@@ -65,8 +79,8 @@ public class Router {
 
     public static void main(String args[]) {
         System.out.println("asdfasf");
-        Router r = new Router("./test.txt", false);
-        Router r2 = new Router("./test2.txt", false);
+        Router r = new Router("test.txt", false);
+        Router r2 = new Router("test2.txt", false);
         String s = "127.0.0.1 9877 1" + "\n" + "127.0.0.1 9876 1" + "\n" + "127.0.0.1 9874 1";
 
         try {
