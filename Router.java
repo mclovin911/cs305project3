@@ -4,9 +4,12 @@ import java.io.FileNotFoundException;
 import java.lang.Integer;
 import java.net.*;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 public class Router {
 
     Socket s;
+    ReentrantLock lock;
     private boolean reverse;
     private Address addr;
     private String ip;
@@ -20,6 +23,7 @@ public class Router {
 
         this.reverse = reverse;
         t= new Table();
+        lock = new ReentrantLock();
         readFile(filename);
 
         try {
@@ -36,11 +40,16 @@ public class Router {
         receiveThread m = new receiveThread(this);
         Thread mT = new Thread(m);
         mT.start();
-        readThread r = new readThread();
+        readThread r = new readThread(this);
         Thread rT = new Thread(r);
         rT.start();
 
     }
+
+    public ReentrantLock getLock() {
+        return lock;
+    }
+
     public boolean isReverse() {
         return reverse;
     }
@@ -229,8 +238,8 @@ class updateThread implements Runnable{
                 Map.Entry key_value = (Map.Entry)iterator.next();
                 Address address     = (Address)key_value.getKey(); //to which router
                 Integer dist        = (Integer)key_value.getValue(); //the distance
-                System.out.println(r.getDVString());
-                System.out.println("from ididid "+from.getIp()+"  "+from.getPort());
+                //System.out.println(r.getDVString());
+                //System.out.println("from ididid "+from.getIp()+"  "+from.getPort());
                 int newer           = r.DV.get(from) + dist; //the distance go though this  map router
                 if(r.DV.containsKey(address)){//if this router is the neighbor
                     int old = r.DV.get(address);   //the old distance
@@ -308,6 +317,35 @@ class receiveThread  implements Runnable {
 }
 
 class readThread implements Runnable {
+    private Router r;
+
+    /**
+     * Constructor of readThread
+     */
+    public readThread(Router r) {
+        this.r = r;
+    }
+    public synchronized void print(){
+        System.out.println("Current DV for router " + r.getAddr().toString() + ": " + "\n" + r.getDVString());
+
+        Iterator it = r.neighborDV.entrySet().iterator();
+
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            Address from = (Address) pair.getKey(); //from which router
+            HashMap<Address, Integer> dv = (HashMap<Address, Integer>) pair.getValue();//the dv from that router
+
+            Iterator iterator = dv.entrySet().iterator();
+
+            System.out.println("DV received from " + from.toString());
+            while (iterator.hasNext()) {
+                Map.Entry key_value = (Map.Entry) iterator.next();
+                Address address = (Address) key_value.getKey(); //to which router
+                Integer dist = (Integer) key_value.getValue(); //the distance
+                System.out.println(address.toString()+" "+dist);
+            }
+        }
+    }
 
     @Override
     public void run() {
@@ -321,12 +359,18 @@ class readThread implements Runnable {
                     String firstWord = s.next();
                     switch (firstWord) {
                         case ("PRINT"): {
-                            System.out.println("Current DV: "+"\n");
-                            //System.
-
-
+                            ReentrantLock lock = r.getLock();
+                            lock.lock();
+                            try {
+                                print();
+                            } finally {
+                                lock.unlock();
+                            }
+                            s.close();
                             break;
                         }
+
+
                         case ("MSG"): {
                             String destIp = s.next();
                             String destPort = s.next();
@@ -337,12 +381,14 @@ class readThread implements Runnable {
                             while(s.hasNext()){
                                 message += " " + s.next();
                             }
+                            break;
 
                         }
                         case ("CHANGE"): {
                             String destIp = s.next();
                             String destPort = s.next();
                             String weight = s.next();
+                            break;
                         }
                     }
                 }
