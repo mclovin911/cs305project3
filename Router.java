@@ -5,29 +5,22 @@ import java.io.FileNotFoundException;
 import java.lang.Integer;
 import java.net.*;
 
-/**
- * This is a router class that simulates the behavior of a router
- */
 public class Router {
-    //This router has a network layer interface, s
-    Socket s;
-    //an indicator of poison reverse
-    boolean reverse;
-    //the ip address of this network layer interface
-    String ip;
-    //the port number
-    int port;
-    //this is the routing table for this router
-    HashMap<String, Integer> rs = new HashMap<String, Integer>();
 
-    /**
-     * the constructor of an router
-     * String filename: the filename of the initial distance vector
-     * boolean reverse: whether to implement poison reverse
-     */
+    Socket s;
+    private boolean reverse;
+    private String ip;
+    private int port;
+    private Table t;
+    HashMap<String, Integer> DV = new HashMap<String, Integer>(); //this distance vector of this router
+    HashMap<String, Integer> distance = new HashMap<String, Integer>(); //this distance to neighbor
+    HashMap<String, HashMap<String, Integer>> neighborDV = new HashMap<String, HashMap<String, Integer>>();//the distance vector that this router received
+
     public Router(String filename, boolean reverse) {
+
+
         this.reverse = reverse;
-        //initialize this router with the given information
+        t= new Table();
         readFile(filename);
 
         try {
@@ -38,7 +31,7 @@ public class Router {
         updateThread u = new updateThread(this, 10000);
         Thread uT = new Thread(u);
         uT.start();
-        msgThread m = new msgThread(this);
+        receiveThread m = new receiveThread(this);
         Thread mT = new Thread(m);
         mT.start();
         readThread r = new readThread();
@@ -48,10 +41,55 @@ public class Router {
 
     }
 
-    /**
-     * This method read the file and saves the information in the file to the memory
-     */
-    public void readFile(String filename) {
+    public boolean isReverse() {
+		return reverse;
+	}
+
+	public void setReverse(boolean reverse) {
+		this.reverse = reverse;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public HashMap<String, Integer> getDV() {
+		return DV;
+	}
+
+	public void setDV(HashMap<String, Integer> dV) {
+		DV = dV;
+	}
+
+	public HashMap<String, Integer> getDistance() {
+		return distance;
+	}
+
+	public void setDistance(HashMap<String, Integer> distance) {
+		this.distance = distance;
+	}
+
+	public HashMap<String, HashMap<String, Integer>> getNeighborDV() {
+		return neighborDV;
+	}
+
+	public void setNeighborDV(HashMap<String, HashMap<String, Integer>> neighborDV) {
+		this.neighborDV = neighborDV;
+	}
+
+	public void readFile(String filename) {
 
         File f = new File(filename);
         String info = "";
@@ -65,7 +103,8 @@ public class Router {
 
                 String[] d = s.nextLine().split(" ");
                 info = d[0] + " " + d[1];
-                rs.put(info, Integer.parseInt(d[2]));
+                distance.put(info, Integer.parseInt(d[2]));
+                DV = distance; //initialize the distance vector. (the weight to known neighbor)
             }
 
         } catch (FileNotFoundException e) {
@@ -75,6 +114,14 @@ public class Router {
         System.out.println("file read ");
 
 
+    }
+    
+    public void putDV(String senderInfo, HashMap<String, Integer> tmp) {
+    	neighborDV.put(senderInfo, tmp);
+    }
+    
+    public void pubInTable(String dest, String next) {
+    	t.put(dest, next);
     }
 
     public static void main(String args[]) {
@@ -94,9 +141,11 @@ public class Router {
 class updateThread implements Runnable{
 
     private long gap;
+    Router r; //this router
 
     public updateThread(Router r, int n){
         gap = n;
+        this.r= r;
     }
 
    @Override
@@ -111,15 +160,29 @@ class updateThread implements Runnable{
            }
        }
    }
+   
+   private void recalcDV() {
+	   
+	   //dist(s) = min of all neighbor i{dist(i->s)+dist(i)}
+	   
+	   
+	   
+	   //this dist to itself is always 0
+	   r.pubInTable(r.getIp(),r.getIp());
+	   
+	   
+	   
+	   
+   }
 
 
 }
 
-class msgThread  implements Runnable {
+class receiveThread  implements Runnable {
 
     Router r;
 
-    public msgThread(Router r) {
+    public receiveThread(Router r) {
         this.r = r;
 
     }
@@ -141,16 +204,14 @@ class msgThread  implements Runnable {
                 Scanner s = new Scanner(info);
                 HashMap<String, Integer> DV;
                 String firstL = s.nextLine();
+                DV = new HashMap<String, Integer>();
                 System.out.println("get msg");
                 while(s.hasNextLine()){
                     String i[] = s.nextLine().split(" ");
-                    DV = new HashMap<String, Integer>();
                     String str = i[0]+" "+i[1];
                     DV.put(str,Integer.parseInt(i[2]));
-
                 }
-                //generateDV();
-
+                r.putDV(firstL, DV); //put the DV sent by the neighbor to the neiborDV. 
 
             }
 
@@ -205,9 +266,4 @@ class readThread implements Runnable {
             }
 
 }
-
-
-
-
-
 
