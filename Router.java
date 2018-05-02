@@ -137,7 +137,7 @@ public class Router {
         String s = "127.0.0.1 9877 1" + "\n" + "127.0.0.1 9876 1" + "\n" + "127.0.0.1 9874 1";
 
         try {
-            r.s.send(s.getBytes(), "127.0.0.2", 9877);
+            r.s.send_dv(s.getBytes(), "127.0.0.2", 9877);
         } catch (Exception e) {
             e.printStackTrace();
         }
