@@ -1,0 +1,10 @@
+#BlueJ class context
+comment0.target=Table
+comment0.text=\n\ forwarding\ table\n
+comment1.params=
+comment1.target=Table()
+comment2.params=dest\ next
+comment2.target=void\ put(java.lang.String,\ java.lang.String)
+comment3.params=key\ value
+comment3.target=void\ replace(java.lang.String,\ java.lang.String)
+numComments=4

@@ -122,8 +122,12 @@ public class Router {
         neighborDV.put(senderInfo, tmp);
     }
 
-    public void pubInTable(String dest, String next) {
+    public void putInTable(String dest, String next) {
         t.put(dest, next);
+    }
+    
+    public void replaceInTable(String dest, String next){
+        t.replace(dest, next);
     }
 
     public static void main(String args[]) {
@@ -169,6 +173,15 @@ class updateThread implements Runnable{
      */
     private void recalcDV() {
         System.out.println("recalcDV");
+        //set the distance to itself to 0
+        if(r.DV.containsKey(r.getAddr())){
+            if(r.DV.get(r.getAddr())!=0){
+                r.DV.replace(r.getAddr(), 0);
+            }        
+        }else{
+            r.DV.put(r.getAddr(),0);
+        }
+        
         Iterator it = r.neighborDV.entrySet().iterator();
         
         while (it.hasNext()) {
@@ -187,9 +200,11 @@ class updateThread implements Runnable{
                    int old = r.DV.get(address);   //the old distance    
                    if( old > newer){
                        r.DV.replace(address, newer);
+                       r.replaceInTable(address.getIp(), from.getIp());
                     }                 
                 }else{
                     r.DV.put(address, newer);
+                    r.putInTable(address.getIp(), from.getIp());
                 }
                 iterator.remove();
             }
@@ -202,7 +217,7 @@ class updateThread implements Runnable{
         //dist(s) = min of all neighbor i{dist(i->s)+dist(i)}
 
         //this dist to itself is always 0
-        r.pubInTable(r.getAddr().getIp(),r.getAddr().getIp());
+        //r.pubInTable(r.getAddr().getIp(),r.getAddr().getIp());
         //r.getDV().put();
 
 
