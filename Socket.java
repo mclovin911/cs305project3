@@ -34,10 +34,14 @@ public class Socket{
         serverSocket.send(send_packet); 
     }
 
-    public void send_msg(String send_data, String ip_address, int port)throws Exception{   
-        String suffixed_data = send_data + " " + ip + "-" + port;
+    public void send_msg(String send_data, String ip_address, int port, String dest_ip, int dest_port){   
+        try{
+        String suffixed_data = "msg "+dest_ip + " " + dest_port + " " + send_data + " " + this.ip + "-" + this.port;
         byte[] msg = suffixed_data.getBytes();
         DatagramPacket send_packet = new DatagramPacket(msg, msg.length, InetAddress.getByName(ip_address), port);
-        serverSocket.send(send_packet);  
+        serverSocket.send(send_packet);
+    }catch (Exception e){
+        System.out.println("fail to send msg in socket");
+    }
     }
 }

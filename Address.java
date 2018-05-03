@@ -1,4 +1,7 @@
 public class Address {
+    public Address(){
+    }
+    
 
     private String ip;
     private int port;

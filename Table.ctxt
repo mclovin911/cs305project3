@@ -7,4 +7,6 @@ comment2.params=dest\ next
 comment2.target=void\ put(Address,\ Address)
 comment3.params=key\ value
 comment3.target=void\ replace(Address,\ Address)
-numComments=4
+comment4.params=key
+comment4.target=Address\ lookup(Address)
+numComments=5

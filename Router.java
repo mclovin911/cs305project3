@@ -45,6 +45,14 @@ public class Router {
         rT.start();
 
     }
+    
+    public String getIp(){
+        return ip;
+    }
+    
+    public int getPort(){
+        return port;
+    }
 
     public ReentrantLock getLock() {
         return lock;
@@ -66,9 +74,6 @@ public class Router {
         this.addr = a;
     }
 
-    public int getPort() {
-        return port;
-    }
 
     public void setPort(int port) {
         this.port = port;
@@ -97,6 +102,7 @@ public class Router {
     public void setNeighborDV(HashMap<Address, HashMap<Address, Integer>> neighborDV) {
         this.neighborDV = neighborDV;
     }
+
     public String getDVString(){
         String s = "";
         Iterator it = DV.entrySet().iterator();
@@ -117,7 +123,7 @@ public class Router {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             Address addr = (Address)pair.getKey();
-           a.add(addr);
+            a.add(addr);
 
         }
         return a;
@@ -150,12 +156,19 @@ public class Router {
         System.out.println("file read ");
 
     }
+
     public void putDV(Address senderInfo, HashMap<Address, Integer> tmp) {
         neighborDV.put(senderInfo, tmp);
     }
 
     public void putInTable(Address dest, Address next) {
         t.put(dest, next);
+    }
+    
+    public Address lookup(String dest_ip, int dest_port){
+        Address dest_addr = new Address(dest_ip, dest_port);
+        Address next_hop = t.lookup(dest_addr);
+        return next_hop;
     }
 
     public void replaceInTable(Address dest, Address next){
@@ -168,7 +181,6 @@ public class Router {
         Router r2 = new Router("./test2.txt", false);
         Router r3 = new Router("./test3.txt", false);
         Router r4 = new Router("./test4.txt", false);
-
 
     }
 }
@@ -198,12 +210,13 @@ class updateThread implements Runnable{
             }
         }
     }
+
     private void broadCastDV(String s){
         ArrayList<Address> neighbor = r.getNeighbors();
         for(int i =0; i<neighbor.size();i++){
             try{
-            r.s.send_dv(s.getBytes(),neighbor.get(i).getIp(),neighbor.get(i).getPort());
-            //System.out.println("Send DV to"+ neighbor.get(i).getPort());
+                r.s.send_dv(s.getBytes(),neighbor.get(i).getIp(),neighbor.get(i).getPort());
+                //System.out.println("Send DV to"+ neighbor.get(i).getPort());
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -232,14 +245,15 @@ class updateThread implements Runnable{
             Address from = (Address)pair.getKey(); //from which router
             HashMap<Address, Integer> dv = (HashMap<Address, Integer>)pair.getValue();//the dv from that router
 
-            Iterator iterator = dv.entrySet().iterator();
+            Iterator iterator = dv.entrySet().iterator();  
+
+            System.out.println("new dv received from "+from.getIp()+"  "+from.getPort()+ " with the following distances:");
 
             while(iterator.hasNext()){
                 Map.Entry key_value = (Map.Entry)iterator.next();
                 Address address     = (Address)key_value.getKey(); //to which router
                 Integer dist        = (Integer)key_value.getValue(); //the distance
-                //System.out.println(r.getDVString());
-                //System.out.println("from ididid "+from.getIp()+"  "+from.getPort());
+                System.out.println(address.getIp().toString() + ": " + address.getPort() + " dist: " + dist);
                 int newer           = r.DV.get(from) + dist; //the distance go though this  map router
                 if(r.DV.containsKey(address)){//if this router is the neighbor
                     int old = r.DV.get(address);   //the old distance
@@ -251,21 +265,12 @@ class updateThread implements Runnable{
                     r.DV.put(address, newer);
                     r.putInTable(address, from);
                 }
-                iterator.remove();
+
             }
-            it.remove(); // avoids a ConcurrentModificationException
+
         }
 
-
-
-
-        //dist(s) = min of all neighbor i{dist(i->s)+dist(i)}
-
-        //this dist to itself is always 0
-        //r.pubInTable(r.getAddr().getIp(),r.getAddr().getIp());
-        //r.getDV().put();
-
-
+        r.neighborDV.clear();
     }
 
 }
@@ -301,9 +306,28 @@ class receiveThread  implements Runnable {
                 while(s.hasNextLine()){
                     String g = s.nextLine();
                     String i[] = g.split(" ");
-                    if(i.length==3){
-                    String str = i[0]+" "+i[1];
-                    DV.put(new Address(i[0],Integer.parseInt(i[1])),Integer.parseInt(i[2].trim()));}
+                    if(i[0].equals("msg")){
+                        String dest_ip = i[1];
+                        int dest_port = Integer.parseInt(i[2]);
+                        StringBuilder sb = new StringBuilder();
+                        for(int j = 3; j < i.length; j++){
+                            sb.append(i[j]);
+                        }
+                        String msg = sb.toString();
+                        
+                        if(dest_ip.equals(r.getIp())&&dest_port == r.getPort()){
+   
+                            System.out.println("Received message: " + msg);
+                        }else{
+                            Address next_hop = r.lookup(dest_ip, dest_port);
+                            r.s.send_msg(msg, next_hop.getIp(), next_hop.getPort(), dest_ip, dest_port);
+                        }
+                    }else{
+                        if(i.length==3){
+                            String str = i[0]+" "+i[1];
+                            DV.put(new Address(i[0],Integer.parseInt(i[1])),Integer.parseInt(i[2].trim()));
+                        }
+                    }
                 }
                 //System.out.println(data.getAddress().toString().split("/")[1]);
                 r.putDV(new Address(data.getAddress().toString().split("/")[1],data.getPort()), DV); //put the DV sent by the neighbor to the neiborDV.
@@ -325,6 +349,7 @@ class readThread implements Runnable {
     public readThread(Router r) {
         this.r = r;
     }
+
     public synchronized void print(){
         System.out.println("Current DV for router " + r.getAddr().toString() + ": " + "\n" + r.getDVString());
 
@@ -369,7 +394,6 @@ class readThread implements Runnable {
                             s.close();
                             break;
                         }
-
 
                         case ("MSG"): {
                             String destIp = s.next();
