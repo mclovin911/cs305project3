@@ -15,8 +15,9 @@ public class Router {
     private String ip;
     private int port;
     private Table t;
+    ArrayList<Address> neighbors = new ArrayList<Address>();
     HashMap<Address, Integer> DV = new HashMap<Address, Integer>(); //this distance vector of this router
-    HashMap<Address, Integer> distance = new HashMap<Address, Integer>(); //this distance to neighbor
+    //HashMap<Address, Integer> distance = new HashMap<Address, Integer>(); //this distance to neighbor
     HashMap<Address, HashMap<Address, Integer>> neighborDV = new HashMap<Address, HashMap<Address, Integer>>();//the distance vector that this router received
 
     public Router(String filename, boolean reverse) {
@@ -34,7 +35,7 @@ public class Router {
         if(s==null){
             System.out.println("?????");
         }
-        updateThread u = new updateThread(this, 3000);
+        updateThread u = new updateThread(this, 5000);
         Thread uT = new Thread(u);
         uT.start();
         receiveThread m = new receiveThread(this);
@@ -45,11 +46,17 @@ public class Router {
         rT.start();
 
     }
-    
+
+    public void dropNeighbor(Address a){
+        DV.replace(a,-1);
+        neighbors.remove(a);
+        //distance.remove(a);
+    }
+
     public String getIp(){
         return ip;
     }
-    
+
     public int getPort(){
         return port;
     }
@@ -87,13 +94,6 @@ public class Router {
         DV = dV;
     }
 
-    public HashMap<Address, Integer> getDistance() {
-        return distance;
-    }
-
-    public void setDistance(HashMap<Address, Integer> distance) {
-        this.distance = distance;
-    }
 
     public HashMap<Address, HashMap<Address, Integer>> getNeighborDV() {
         return neighborDV;
@@ -117,16 +117,8 @@ public class Router {
     }
 
     public ArrayList<Address> getNeighbors(){
-        ArrayList<Address> a = new ArrayList<Address>();
-        Iterator it = distance.entrySet().iterator();
 
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            Address addr = (Address)pair.getKey();
-            a.add(addr);
-
-        }
-        return a;
+        return neighbors;
     }
 
     public void readFile(String filename) {
@@ -145,8 +137,9 @@ public class Router {
                 String[] d = s.nextLine().split(" ");
                 info = d[0] + " " + d[1];
                 Address addr = new Address(d[0],Integer.parseInt(d[1]));
-                distance.put(addr, Integer.parseInt(d[2]));
-                DV = distance; //initialize the distance vector. (the weight to known neighbor)
+                DV.put(addr, Integer.parseInt(d[2]));
+                neighbors.add(addr);
+                //DV = distance; //initialize the distance vector. (the weight to known neighbor)
                 putInTable(addr, addr);
             }
             System.out.println("test get String+"+ "\n"+getDVString() );
@@ -167,10 +160,10 @@ public class Router {
         if(t.containsKey(dest)){
             t.replace(dest, next);
         }else{
-        t.put(dest, next);
+            t.put(dest, next);
+        }
     }
-    }
-    
+
     public Address lookup(String dest_ip, int dest_port){
         Address dest_addr = new Address(dest_ip, dest_port);
         Address next_hop = t.lookup(dest_addr);
@@ -180,25 +173,22 @@ public class Router {
     public void replaceInTable(Address dest, Address next){
         t.replace(dest, next);
     }
-    
+
     public void send(String data,String dest_ip, int dest_port){
         Address next_hop = lookup(dest_ip, dest_port);
         //System.out.println(next_hop.getPort()); //79
         s.send_msg(data, next_hop.getIp(), next_hop.getPort(), dest_ip, dest_port);
     }
-    
+
 
     public static void main(String args[]) {
 
-        Router r = new Router("./test.txt", false);
-        Router r2 = new Router("./test2.txt", false);
-        Router r3 = new Router("./test3.txt", false);
-        Router r4 = new Router("./test4.txt", false);
+        Router r = new Router("./test4.txt", false);
+
         try{
-        TimeUnit.SECONDS.sleep(10);
-    }catch (Exception e){
-    }
-        r2.send("this is a message!", r4.getIp(), r4.getPort());
+            TimeUnit.SECONDS.sleep(10);
+        }catch (Exception e){
+        }
     }
 }
 
@@ -206,10 +196,15 @@ class updateThread implements Runnable{
 
     private long gap;
     Router r; //this router
+    HashMap<Address, Integer> neighborMissCount;
 
     public updateThread(Router r, int n){
         gap = n;
         this.r= r;
+        neighborMissCount = new HashMap<Address, Integer>();
+        for(Address a: r.getNeighbors()){
+            neighborMissCount.put(a,0);
+        }
     }
 
     @Override
@@ -217,6 +212,25 @@ class updateThread implements Runnable{
         while (!Thread.currentThread().isInterrupted()) {
 
             //System.out.println("update !!!");
+            //System.out.println(r.getNeighbors().size());
+            ArrayList<Address> toDrop = new ArrayList<Address>();
+            for(int i =0; i<r.getNeighbors().size();i++) {
+                if (!r.getNeighborDV().containsKey(r.getNeighbors().get(i))){
+                    Integer oldValue = neighborMissCount.get(r.getNeighbors().get(i));
+                    System.out.println(oldValue);
+                    if(oldValue ==2){
+                        //System.out.println("Receive no DV from "+r.getNeighbors().get(i).toString()+" after 3 update, this neighbor is droped");
+
+                        toDrop.add(r.getNeighbors().get(i));
+
+                    }else{
+                    neighborMissCount.replace(r.getNeighbors().get(i),++oldValue);}
+                }
+            }
+            for(Address ad:toDrop){
+                r.dropNeighbor(ad);
+            }
+            toDrop.clear();
             recalcDV();
             broadCastDV(r.getDVString());
 
@@ -262,7 +276,7 @@ class updateThread implements Runnable{
             Address from = (Address)pair.getKey(); //from which router
             HashMap<Address, Integer> dv = (HashMap<Address, Integer>)pair.getValue();//the dv from that router
 
-            Iterator iterator = dv.entrySet().iterator();  
+            Iterator iterator = dv.entrySet().iterator();
 
             //System.out.println("new dv received from "+from.getIp()+"  "+from.getPort()+ " with the following distances:");
 
@@ -334,7 +348,7 @@ class receiveThread  implements Runnable {
                         String msg = sb.toString();
                         System.out.println("check for port:" + dest_port + " : " + r.getPort());
                         if(dest_ip.equals(r.getIp())&&dest_port == r.getPort()){
-                            
+
                             System.out.println("Received message: " + msg);
                         }else{
                             System.out.println("redirecting message: " + msg);
@@ -416,7 +430,7 @@ class readThread implements Runnable {
 
                         case ("MSG"): {
                             String destIp = s.next();
-                            String destPort = s.next();
+                            int destPort = Integer.parseInt(s.next());
                             String message = "";
                             if(s.hasNext()){
                                 message += s.next();
@@ -424,6 +438,8 @@ class readThread implements Runnable {
                             while(s.hasNext()){
                                 message += " " + s.next();
                             }
+
+                            r.send(message, destIp, destPort);
                             break;
 
                         }
@@ -431,6 +447,7 @@ class readThread implements Runnable {
                             String destIp = s.next();
                             String destPort = s.next();
                             String weight = s.next();
+                            r.DV.replace(new Address(destIp,Integer.parseInt(destPort)),Integer.parseInt(weight));
                             break;
                         }
                     }
