@@ -189,16 +189,20 @@ public class Router {
     
 
     public static void main(String args[]) {
-
-        Router r = new Router("./test.txt", false);
-        Router r2 = new Router("./test2.txt", false);
-        Router r3 = new Router("./test3.txt", false);
-        Router r4 = new Router("./test4.txt", false);
+        String fileName;
+        if(args.length== 1){
+            fileName = args[0];
+            Router r = new Router(fileName, false);
+        }else{
+            System.out.println("wrong argument");
+        }
+        
+        
         try{
         TimeUnit.SECONDS.sleep(10);
     }catch (Exception e){
     }
-        r2.send("this is a message!", r4.getIp(), r4.getPort());
+        //r2.send("this is a message!", r4.getIp(), r4.getPort());
     }
 }
 
@@ -233,7 +237,7 @@ class updateThread implements Runnable{
         for(int i =0; i<neighbor.size();i++){
             try{
                 r.s.send_dv(s.getBytes(),neighbor.get(i).getIp(),neighbor.get(i).getPort());
-                //System.out.println("Send DV to"+ neighbor.get(i).getPort());
+                System.out.println("Send DV to"+ neighbor.get(i).getPort());
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -431,6 +435,7 @@ class readThread implements Runnable {
                             String destIp = s.next();
                             String destPort = s.next();
                             String weight = s.next();
+                            r.DV.replace(new Address(destIp, Integer.parseInt(destPort)), Integer.parseInt(weight));
                             break;
                         }
                     }
