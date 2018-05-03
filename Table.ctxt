@@ -9,4 +9,6 @@ comment3.params=key\ value
 comment3.target=void\ replace(Address,\ Address)
 comment4.params=key
 comment4.target=Address\ lookup(Address)
-numComments=5
+comment5.params=key
+comment5.target=boolean\ containsKey(Address)
+numComments=6

@@ -19,6 +19,8 @@ public class Table {
     }
     
     public Address lookup(Address key){
+        //System.out.println("key is: " + key.toString());
+        //System.out.println("table is: " + table.toString());
         if(table.containsKey(key)){
             return table.get(key);
         }else{
@@ -26,4 +28,9 @@ public class Table {
             return null;
         }
     }
+    
+    public boolean containsKey(Address key){
+        return table.containsKey(key);
+    }
+    
 }

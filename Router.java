@@ -3,7 +3,7 @@ import java.util.*;
 import java.io.FileNotFoundException;
 import java.lang.Integer;
 import java.net.*;
-
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Router {
@@ -34,7 +34,7 @@ public class Router {
         if(s==null){
             System.out.println("?????");
         }
-        updateThread u = new updateThread(this, 10000);
+        updateThread u = new updateThread(this, 3000);
         Thread uT = new Thread(u);
         uT.start();
         receiveThread m = new receiveThread(this);
@@ -144,8 +144,10 @@ public class Router {
 
                 String[] d = s.nextLine().split(" ");
                 info = d[0] + " " + d[1];
-                distance.put(new Address(d[0],Integer.parseInt(d[1])), Integer.parseInt(d[2]));
+                Address addr = new Address(d[0],Integer.parseInt(d[1]));
+                distance.put(addr, Integer.parseInt(d[2]));
                 DV = distance; //initialize the distance vector. (the weight to known neighbor)
+                putInTable(addr, addr);
             }
             System.out.println("test get String+"+ "\n"+getDVString() );
 
@@ -162,7 +164,11 @@ public class Router {
     }
 
     public void putInTable(Address dest, Address next) {
+        if(t.containsKey(dest)){
+            t.replace(dest, next);
+        }else{
         t.put(dest, next);
+    }
     }
     
     public Address lookup(String dest_ip, int dest_port){
@@ -174,6 +180,13 @@ public class Router {
     public void replaceInTable(Address dest, Address next){
         t.replace(dest, next);
     }
+    
+    public void send(String data,String dest_ip, int dest_port){
+        Address next_hop = lookup(dest_ip, dest_port);
+        //System.out.println(next_hop.getPort()); //79
+        s.send_msg(data, next_hop.getIp(), next_hop.getPort(), dest_ip, dest_port);
+    }
+    
 
     public static void main(String args[]) {
 
@@ -181,7 +194,11 @@ public class Router {
         Router r2 = new Router("./test2.txt", false);
         Router r3 = new Router("./test3.txt", false);
         Router r4 = new Router("./test4.txt", false);
-
+        try{
+        TimeUnit.SECONDS.sleep(10);
+    }catch (Exception e){
+    }
+        r2.send("this is a message!", r4.getIp(), r4.getPort());
     }
 }
 
@@ -247,19 +264,20 @@ class updateThread implements Runnable{
 
             Iterator iterator = dv.entrySet().iterator();  
 
-            System.out.println("new dv received from "+from.getIp()+"  "+from.getPort()+ " with the following distances:");
+            //System.out.println("new dv received from "+from.getIp()+"  "+from.getPort()+ " with the following distances:");
 
             while(iterator.hasNext()){
                 Map.Entry key_value = (Map.Entry)iterator.next();
                 Address address     = (Address)key_value.getKey(); //to which router
                 Integer dist        = (Integer)key_value.getValue(); //the distance
-                System.out.println(address.getIp().toString() + ": " + address.getPort() + " dist: " + dist);
+                //System.out.println(address.getIp().toString() + ": " + address.getPort() + " dist: " + dist);
                 int newer           = r.DV.get(from) + dist; //the distance go though this  map router
                 if(r.DV.containsKey(address)){//if this router is the neighbor
                     int old = r.DV.get(address);   //the old distance
                     if( old > newer){
                         r.DV.replace(address, newer);
                         r.replaceInTable(address, from);
+                        r.putInTable(address, from);
                     }
                 }else{
                     r.DV.put(address, newer);
@@ -314,11 +332,12 @@ class receiveThread  implements Runnable {
                             sb.append(i[j]);
                         }
                         String msg = sb.toString();
-                        
+                        System.out.println("check for port:" + dest_port + " : " + r.getPort());
                         if(dest_ip.equals(r.getIp())&&dest_port == r.getPort()){
-   
+                            
                             System.out.println("Received message: " + msg);
                         }else{
+                            System.out.println("redirecting message: " + msg);
                             Address next_hop = r.lookup(dest_ip, dest_port);
                             r.s.send_msg(msg, next_hop.getIp(), next_hop.getPort(), dest_ip, dest_port);
                         }
