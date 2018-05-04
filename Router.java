@@ -167,7 +167,7 @@ public class Router {
 
     }
 
-    public void putDV(Address senderInfo, HashMap<Address, Integer> tmp) {
+    public void putNeighborDV(Address senderInfo, HashMap<Address, Integer> tmp) {
         neighborDV.put(senderInfo, tmp);
     }
 
@@ -198,7 +198,7 @@ public class Router {
 
     public static void main(String args[]) {
 
-        Router r = new Router("./test.txt", true);
+        Router r = new Router("./test4.txt", true);
 
         try{
             TimeUnit.SECONDS.sleep(10);
@@ -246,7 +246,8 @@ class updateThread implements Runnable{
                 r.dropNeighbor(ad);
             }
             toDrop.clear();
-            recalcDV();
+
+            r.neighborDV.clear();
             if(!r.isReverse()){
             broadCastDV(r.getDVString());
             }else{
@@ -294,11 +295,22 @@ class updateThread implements Runnable{
         }
     }
 
+
+}
+
+class receiveThread  implements Runnable {
+
+    Router r;
+
+    public receiveThread(Router r) {
+        this.r = r;
+
+    }
     /**
      * run distance vector algorithm and update the distance vector
      */
     private void recalcDV() {
-        System.out.println("recalcDV");
+        //System.out.println("recalcDV");
         //set the distance to itself to 0
         if(r.DV.containsKey(r.getAddr())){
             if(r.DV.get(r.getAddr())!=0){
@@ -341,19 +353,8 @@ class updateThread implements Runnable{
 
         }
 
-        r.neighborDV.clear();
     }
 
-}
-
-class receiveThread  implements Runnable {
-
-    Router r;
-
-    public receiveThread(Router r) {
-        this.r = r;
-
-    }
 
     @Override
     public void run() {
@@ -394,7 +395,16 @@ class receiveThread  implements Runnable {
                             Address next_hop = r.lookup(dest_ip, dest_port);
                             r.s.send_msg(msg, next_hop.getIp(), next_hop.getPort(), dest_ip, dest_port);
                         }
-                    }else{
+                    }
+                    else if(i[0].equals("CHANGE")){
+                        System.out.println("reveice change weight");
+                        Address ad = new Address(i[1],Integer.parseInt(i[2]));
+                        r.DV.replace(ad,Integer.parseInt(i[3].trim()));
+                    }
+
+
+
+                    else{
                         if(i.length==3){
                             String str = i[0]+" "+i[1];
                             DV.put(new Address(i[0],Integer.parseInt(i[1])),Integer.parseInt(i[2].trim()));
@@ -402,8 +412,9 @@ class receiveThread  implements Runnable {
                     }
                 }
                 //System.out.println(data.getAddress().toString().split("/")[1]);
-                r.putDV(new Address(data.getAddress().toString().split("/")[1],data.getPort()), DV); //put the DV sent by the neighbor to the neiborDV.
+                r.putNeighborDV(new Address(data.getAddress().toString().split("/")[1],data.getPort()), DV); //put the DV sent by the neighbor to the neiborDV.
 
+                recalcDV();
             }
 
         }
@@ -443,6 +454,7 @@ class readThread implements Runnable {
             }
         }
     }
+
 
     @Override
     public void run() {
@@ -487,6 +499,8 @@ class readThread implements Runnable {
                             String destPort = s.next();
                             String weight = s.next();
                             r.DV.replace(new Address(destIp,Integer.parseInt(destPort)),Integer.parseInt(weight));
+                            String msg = "CHANGE "+r.getAddr().toString()+" "+weight;
+                            r.s.send_change(msg.getBytes(),destIp,Integer.parseInt(destPort));
                             System.out.println("SUC");
                             break;
                         }
