@@ -18,7 +18,7 @@ public class Table {
         table = new HashMap<Address, Address>();
     }
     /**
-     * Put a entry into the table 
+     * Put a entry into the table
      * @param destination address
      * @param next hop address
      */
@@ -27,7 +27,7 @@ public class Table {
     }
     /**
      * replace a entry in the table
-     * @param key 
+     * @param key
      * @param value
      */
     public void replace(Address key, Address value){
@@ -38,7 +38,7 @@ public class Table {
      * @param destination addr
      * @return the next hop addr
      */
-    
+
     public Address lookup(Address key){
         //System.out.println("key is: " + key.toString());
         //System.out.println("table is: " + table.toString());
@@ -50,12 +50,12 @@ public class Table {
         }
     }
     /**
-     * Check if the Table contains the destination Address 
+     * Check if the Table contains the destination Address
      * @param dest addr
      * @return if it contains
      */
     public boolean containsKey(Address key){
         return table.containsKey(key);
     }
-    
+
 }

@@ -2,16 +2,16 @@
  * Simulation of Address.
  * Address contains an IP address and a Port number
  * Which represents the IP and Port for the router in out program
- * 
+ *
  * @Author Jun Zhou, Wei Xingwen
  * @version May.4th.2018
  */
 public class Address {
-	/**
-	 * Default Constructor
-	 */
+    /**
+     * Default Constructor
+     */
     public Address() {
-    	
+
     }
     /**
      * Constructor
@@ -25,28 +25,28 @@ public class Address {
     private String ip;
     private int port;
     /**
-     * 
+     *
      * @return IP
      */
     public String getIp() {
         return ip;
     }
     /**
-     * 
+     *
      * @param ip
      */
     public void setIp(String ip) {
         this.ip = ip;
     }
     /**
-     * 
+     *
      * @return port number
      */
     public int getPort() {
         return port;
     }
     /**
-     * 
+     *
      * @param port
      */
     public void setPort(int port) {
