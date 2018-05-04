@@ -35,7 +35,7 @@ public class Router {
         if(s==null){
             System.out.println("?????");
         }
-        updateThread u = new updateThread(this, 5000);
+        updateThread u = new updateThread(this, 15000);
         Thread uT = new Thread(u);
         uT.start();
         receiveThread m = new receiveThread(this);
@@ -47,8 +47,10 @@ public class Router {
 
     }
 
+
+
     public void dropNeighbor(Address a){
-        DV.replace(a,-1);
+        DV.replace(a,99999);
         neighbors.remove(a);
         //distance.remove(a);
     }
@@ -106,6 +108,19 @@ public class Router {
     public String getDVString(){
         String s = "";
         Iterator it = DV.entrySet().iterator();
+
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            Address addr = (Address)pair.getKey();
+            s = s+addr.getIp()+" "+addr.getPort()+" "+pair.getValue()+"\n";
+
+        }
+        return s;
+    }
+
+    public String getString(HashMap<Address,Integer> HM){
+        String s = "";
+        Iterator it = HM.entrySet().iterator();
 
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
@@ -183,33 +198,11 @@ public class Router {
 
     public static void main(String args[]) {
 
-        String fileName;
-        if(args.length== 1){
-            fileName = args[0];
-            Router r = new Router(fileName, false);
-        }else{
-            System.out.println("wrong argument");
-        }
-        
-        
-        try{
-        TimeUnit.SECONDS.sleep(10);
-    }catch (Exception e){
-    }
-        //r2.send("this is a message!", r4.getIp(), r4.getPort());
+        Router r = new Router("./test.txt", true);
 
-    }
-    
-    public void broadCastDV(String str){
-        ArrayList<Address> neighbor = getNeighbors();
-        for(int i =0; i<neighbor.size();i++){
-            try{
-                s.send_dv(str.getBytes(),neighbor.get(i).getIp(),neighbor.get(i).getPort());
-                System.out.println("Send DV to"+ neighbor.get(i).getPort());
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
+        try{
+            TimeUnit.SECONDS.sleep(10);
+        }catch (Exception e){
         }
     }
 }
@@ -254,7 +247,12 @@ class updateThread implements Runnable{
             }
             toDrop.clear();
             recalcDV();
-            r.broadCastDV(r.getDVString());
+            if(!r.isReverse()){
+            broadCastDV(r.getDVString());
+            }else{
+                applyPoison();
+            }
+
 
             try {
                 Thread.sleep(gap);
@@ -264,7 +262,37 @@ class updateThread implements Runnable{
         }
     }
 
-    
+    private void applyPoison(){
+        HashMap<Address,Integer> poDV = new HashMap<Address, Integer>();
+        Iterator it = r.getDV().entrySet().iterator();
+
+        while (it.hasNext()) {
+            Map.Entry key_value = (Map.Entry)it.next();
+            Address address     = (Address)key_value.getKey(); //to which router
+            Integer dist        = (Integer)key_value.getValue(); //the distance
+            if(address==r.getAddr()){
+                dist=99999;
+            }
+            poDV.put(address,dist);
+            broadCastDV(r.getString(poDV));
+
+        }
+
+
+    }
+
+    private void broadCastDV(String s){
+        ArrayList<Address> neighbor = r.getNeighbors();
+        for(int i =0; i<neighbor.size();i++){
+            try{
+                r.s.send_dv(s.getBytes(),neighbor.get(i).getIp(),neighbor.get(i).getPort());
+                //System.out.println("Send DV to"+ neighbor.get(i).getPort());
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
 
     /**
      * run distance vector algorithm and update the distance vector
@@ -458,9 +486,8 @@ class readThread implements Runnable {
                             String destIp = s.next();
                             String destPort = s.next();
                             String weight = s.next();
-
                             r.DV.replace(new Address(destIp,Integer.parseInt(destPort)),Integer.parseInt(weight));
-                            r.broadCastDV(r.getDVString());
+                            System.out.println("SUC");
                             break;
                         }
                     }
