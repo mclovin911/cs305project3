@@ -1,14 +1,19 @@
 #BlueJ class context
 comment0.target=Table
-comment0.text=\n\ forwarding\ table\n
+comment0.text=\n\ forwarding\ table\n\ Contains\ a\ map\ between\ Address\ to\ Address,\n\ The\ first\ address\ is\ the\ destination\ address\ and\ the\ second\ is\ the\ next\ hop\ address\n\ A\ router\ can\ look\ up\ for\ the\ next\ hop\ in\ the\ table\n
 comment1.params=
 comment1.target=Table()
+comment1.text=\n\ Constructor\n
 comment2.params=dest\ next
 comment2.target=void\ put(Address,\ Address)
+comment2.text=\n\ Put\ a\ entry\ into\ the\ table\n\ @param\ destination\ address\n\ @param\ next\ hop\ address\n
 comment3.params=key\ value
 comment3.target=void\ replace(Address,\ Address)
+comment3.text=\n\ replace\ a\ entry\ in\ the\ table\n\ @param\ key\n\ @param\ value\n
 comment4.params=key
 comment4.target=Address\ lookup(Address)
+comment4.text=\n\ look\ up\ for\ the\ next\ hop\ addr\n\ @param\ destination\ addr\n\ @return\ the\ next\ hop\ addr\n
 comment5.params=key
 comment5.target=boolean\ containsKey(Address)
+comment5.text=\n\ Check\ if\ the\ Table\ contains\ the\ destination\ Address\n\ @param\ dest\ addr\n\ @return\ if\ it\ contains\n
 numComments=6

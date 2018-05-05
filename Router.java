@@ -21,7 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Router {
 
-    Boolean Debug = false;
+    Boolean Debug = true;
     private long startTime; // record the current time
     private Socket s; // socket for sending and receiving data
     private boolean reverse;// apply poison reverse or not
