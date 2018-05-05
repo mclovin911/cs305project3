@@ -21,7 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Router {
 
-    Boolean Debug = true;
+    Boolean Debug = false;
     private long startTime; // record the current time
     private Socket s; // socket for sending and receiving data
     private boolean reverse;// apply poison reverse or not
@@ -78,8 +78,8 @@ public class Router {
      */
     public void dropNeighbor(Address a) {
 
-        if (Debug)
-            System.out.println("neighbor " + a.toString() + " dropped");
+        if (Debug){
+            System.out.println("neighbor " + a.toString() + " dropped");}
         DV.replace(a, 99999);
         neighbors.remove(a);
         // distance.remove(a);
@@ -338,7 +338,7 @@ public class Router {
 
     public static void main(String args[]) {
 
-        Router r = new Router("./test.txt", true);
+        Router r = new Router("./F.txt", false);
 
         try {
             TimeUnit.SECONDS.sleep(10);
@@ -440,8 +440,8 @@ class updateThread implements Runnable {
      * @param s
      */
     private void broadCastDV(String s) {
-        if (r.Debug) {
-            //System.out.println(s);}
+        if (r.Debug){}
+            //System.out.println(s);
             ArrayList<Address> neighbor = r.getNeighbors();
             for (int i = 0; i < neighbor.size(); i++) {
                 try {
@@ -452,7 +452,7 @@ class updateThread implements Runnable {
                 }
 
             }
-        }
+
 
     }
 }
@@ -499,6 +499,7 @@ class receiveThread implements Runnable {
                 Integer dist = (Integer) key_value.getValue(); // the distance
                 // System.out.println(address.getIp().toString() + ": " + address.getPort() + "
                 // dist: " + dist);
+
                 int newer = r.DV.get(from) + dist; // the distance go though this map router
                 if (r.DV.containsKey(address)) {// if this router is the neighbor
                     int old = r.DV.get(address); // the old distance
@@ -561,15 +562,14 @@ class receiveThread implements Runnable {
 
                             Address next_hop = r.lookup(dest_ip, dest_port);
                             r.getSocket().send_msg(msg, next_hop.getIp(), next_hop.getPort(), dest_ip, dest_port);
-                            if(r.Debug)
-                                System.out.println("Message msg from"+ data.getAddress().toString().split("/")[1]+" "+data.getPort() + " to " + dest_ip+" "+dest_port+" forwarded to "+next_hop+" "+msg);
+
+                                System.out.println("Message msg from "+ data.getAddress().toString().split("/")[1]+" "+data.getPort() + " to " + dest_ip+" "+dest_port+" forwarded to "+next_hop+" "+msg+" ");
                         }
                     } else if (i[0].equals("CHANGE")) {
 
                         Address ad = new Address(i[1], Integer.parseInt(i[2]));
                         r.DV.replace(ad, Integer.parseInt(i[3].trim()));
 
-                        if(r.Debug)
                             System.out.println("new weight to neighbor"+ ad.toString()+ " of " +Integer.parseInt(i[3].trim()));
                     }
 
@@ -589,7 +589,7 @@ class receiveThread implements Runnable {
 
 
                 recalcDV();
-                System.out.println(r.getDVString());
+                if(r.Debug)System.out.println(r.getDVString());
 
             }
 
@@ -626,6 +626,7 @@ class readThread implements Runnable {
                 Map.Entry key_value = (Map.Entry) iterator.next();
                 Address address = (Address) key_value.getKey(); // to which router
                 Integer dist = (Integer) key_value.getValue(); // the distance
+
                 System.out.println(address.toString() + " " + dist);
             }
         }
