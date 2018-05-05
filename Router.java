@@ -29,7 +29,7 @@ public class Router {
     private Table t;// forwarding table of this router
     ArrayList<Address> neighbors = new ArrayList<Address>();// neighbors of this router
     HashMap<Address, Integer> DV = new HashMap<Address, Integer>(); // this distance vector of this router
-    // HashMap<Address, Integer> distance = new HashMap<Address, Integer>(); //this
+    HashMap<Address, Integer> distance = new HashMap<Address, Integer>(); //this
     // distance to neighbor
     HashMap<Address, HashMap<Address, Integer>> neighborDV = new HashMap<Address, HashMap<Address, Integer>>();// the
     // distance
@@ -238,6 +238,7 @@ public class Router {
                 info = d[0] + " " + d[1];
                 Address addr = new Address(d[0], Integer.parseInt(d[1]));
                 DV.put(addr, Integer.parseInt(d[2]));
+                distance.put(addr, Integer.parseInt(d[2]));
                 neighbors.add(addr);// get the neighbors
                 putInTable(addr, addr);
             }
@@ -336,7 +337,7 @@ public class Router {
         return s;
     }
 
-    public static void main(String args[]) {
+     public static void main(String args[]) {
     	
     	if (args.length != 2) {
            System.out.println("Pls provide filename and reverse");
@@ -505,7 +506,7 @@ class receiveThread implements Runnable {
                 // System.out.println(address.getIp().toString() + ": " + address.getPort() + "
                 // dist: " + dist);
 
-                int newer = r.DV.get(from) + dist; // the distance go though this map router
+                int newer = r.distance.get(from) + dist; // the distance go though this map router
                 if (r.DV.containsKey(address)) {// if this router is the neighbor
                     int old = r.DV.get(address); // the old distance
                     if (old > newer) {
@@ -516,7 +517,7 @@ class receiveThread implements Runnable {
                     }
                 } else {
                     r.DV.put(address, newer);
-                    r.putInTable(address, from);
+                    //r.putInTable(address, from);
 
                 }
 
@@ -574,6 +575,9 @@ class receiveThread implements Runnable {
 
                         Address ad = new Address(i[1], Integer.parseInt(i[2]));
                         r.DV.replace(ad, Integer.parseInt(i[3].trim()));
+                        r.distance.replace(ad, Integer.parseInt(i[3].trim()));
+                        System.out.println(r.getDVString());
+
 
                             System.out.println("new weight to neighbor"+ ad.toString()+ " of " +Integer.parseInt(i[3].trim()));
                     }
@@ -675,6 +679,7 @@ class readThread implements Runnable {
                             String destIp = s.next();
                             String destPort = s.next();
                             String weight = s.next();
+                            r.distance.replace(new Address(destIp, Integer.parseInt(destPort)), Integer.parseInt(weight));
                             r.DV.replace(new Address(destIp, Integer.parseInt(destPort)), Integer.parseInt(weight));
                             String msg = "CHANGE " + r.getAddr().toString() + " " + weight;
                             r.getSocket().send_change(msg.getBytes(), destIp, Integer.parseInt(destPort));
