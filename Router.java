@@ -476,6 +476,7 @@ class receiveThread implements Runnable {
      * run distance vector algorithm and update the distance vector
      */
     private void recalcDV() {
+        r.DV.clear();
         if(r.Debug)
             System.out.println("new dv calculated: ");
         // set the distance to itself to 0
@@ -511,7 +512,7 @@ class receiveThread implements Runnable {
                     int old = r.DV.get(address); // the old distance
                     if (old > newer) {
                         r.DV.replace(address, newer);
-                        r.replaceInTable(address, from);
+                        //r.replaceInTable(address, from);
                         r.putInTable(address, from);
 
                     }
@@ -574,7 +575,7 @@ class receiveThread implements Runnable {
                     } else if (i[0].equals("CHANGE")) {
 
                         Address ad = new Address(i[1], Integer.parseInt(i[2]));
-                        r.DV.replace(ad, Integer.parseInt(i[3].trim()));
+                        //r.DV.replace(ad, Integer.parseInt(i[3].trim()));
                         r.distance.replace(ad, Integer.parseInt(i[3].trim()));
                         System.out.println(r.getDVString());
 
