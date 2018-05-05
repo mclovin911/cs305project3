@@ -337,9 +337,14 @@ public class Router {
         return s;
     }
 
-    public static void main(String args[]) {
+     public static void main(String args[]) {
+    	
+    	if (args.length != 2) {
+           System.out.println("Pls provide filename and reverse");
+        }
 
-        Router r = new Router("./EX1.txt", true);
+        Router r = new Router(args[0], Boolean.parseBoolean(args[1]));
+        
 
         try {
             TimeUnit.SECONDS.sleep(10);
